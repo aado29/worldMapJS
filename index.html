@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Map</title>
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="mapScript.js"></script>
+	<script type="text/javascript" src="world.js"></script>
+	<script type="text/javascript">
+		jQuery(function() {
+			$('#submit').click(function() {
+				var txt = $('#txt').val();
+				txt = txt.split(',');
+	            jQuery('#map').worldMap({
+	            	country: txt,
+	            	activeClass: 'green'
+	            });
+	            return false;
+	        });
+        });
+	</script>
+	<style type="text/css">
+		svg {
+		    width: 100%;
+		    height: auto;
+		}
+		path {
+		    fill: #d1d2d4;
+		}
+		.pointer {
+		    fill: #fff;
+		    stroke: #595a5a;
+		}
+		.green {
+		    fill: #83b441;
+		    stroke: #518a3f;
+		}
+		.green:hover {
+		    fill: #518a3f;
+		}
+		.blue {
+			fill: blue;
+		}
+	</style>
+</head>
+<body>
+	<form action="">
+		<input id="txt" type="text" placeholder="CA,VE,US"><br>
+		<button id="submit">Submit</button>
+	</form>
+	<div id="map"></div>
+</body>
+</html>

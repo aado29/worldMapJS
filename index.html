@@ -4,16 +4,15 @@
 	<meta charset="UTF-8">
 	<title>Map</title>
 	<script type="text/javascript" src="jquery.js"></script>
-	<script type="text/javascript" src="mapScript.js"></script>
 	<script type="text/javascript" src="world.js"></script>
 	<script type="text/javascript">
-		jQuery(function() {
+		$(function() {
 			$('#submit').click(function() {
 				var txt = $('#txt').val();
 				txt = txt.split(',');
-	            jQuery('#map').worldMap({
+	            $('#map').worldMap({
 	            	country: txt,
-	            	activeClass: 'green'
+	            	activeClass: 'green',
 	            });
 	            return false;
 	        });
@@ -44,10 +43,9 @@
 	</style>
 </head>
 <body>
-	<form action="">
-		<input id="txt" type="text" placeholder="CA,VE,US"><br>
-		<button id="submit">Submit</button>
-	</form>
+	<input id="txt" type="text" name="nombre" value="CA,VE,US,RU" placeholder="CA,VE,US,RU"><br>
+	<button id="submit">Submit</button>
 	<div id="map"></div>
+	<script type="text/javascript" src="mapScript.js"></script>
 </body>
 </html>

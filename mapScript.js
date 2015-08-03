@@ -1,37 +1,41 @@
-(function(d) {
-	d.fn.worldMap = function(a) {
-		a = d.extend({}, {
+$.fn.extend({
+    worldMap: function(a) {
+		a = $.extend(true, {
 			country: '',
-			activeClass: 'green'
+			activeClass: '',
+			names: true
 		}, a);
-		var e = d(jQuery(this));
-		var latlonrg = /(\d+(?:\.\d+)?)[\xb0\s]?\s*(?:(\d+(?:\.\d+)?)['\u2019\u2032\s])?\s*(?:(\d+(?:\.\d+)?)["\u201d\u2033\s])?\s*([SNEW])?/i;
-		this.draw = function(b) {
+
+		function draw(b) {
 			var out = '<svg version="1.0" viewBox="-10 -10 1000 400" xmlns="http://www.w3.org/2000/svg">';
 			for (var country in worldmap.shapes) {
 				var key = worldmap.shapes[country].key,
 				value = worldmap.shapes[country].value;
-				if (this.examinar(b, key))
-				    out += this.shape(value, key, true);
+				if (examinar(b, key))
+				    out += shape(value, key, true);
 				else
-					out += this.shape(value, key, false);
+					out += shape(value, key, false);
 			}
-			out += '</svg>'
+			out += '</svg>';
+			if (a.names)
+				out += '<div id="mouseMap"></div>';
 			return out;
 		};
-		this.shape = function(value, key, active) {
+
+		function shape(value, key, active) {
 			if (active) {
 				var out = '<path id="' + key + '" class="'+a.activeClass+'" d="' + value + '">';
 				out += '</path>';
 				if (worldmap.positions[key] != "0,0")
-					out += '<path class="pointer" id="pointer-' + key + '" d="'+ this.getXY(worldmap.positions[key]) + worldmap.pointer.shape + '"></path>';
+					out += '<path class="pointer" id="pointer-' + key + '" d="'+ getXY(worldmap.positions[key]) + worldmap.pointer.shape + '"></path>';
 			} else {
 				var out = '<path id="' + key + '" d="' + value + '">';
 				out += '</path>';
 			}
 			return out;
 		};
-		this.examinar = function(n, m) {
+
+		function examinar(n, m) {
 			var aux;
 			for (var i in n) {
 				n[i] = n[i].toUpperCase();
@@ -40,41 +44,66 @@
 			}
 			return aux;
 		};
-		this.getXY = function(coor) {
+
+		function getXY(coor) {
 			var coordinates = coor.split(',');
 			var longitud = coordinates[1] * 2.6938 + 465.4;
 			var latitud = coordinates[0] * -2.6938 + 212.066
 			return worldmap.pointer.position + longitud.toString() + ',' + latitud.toString();
 		};
-		this.drawName = function(e) {
-			jQuery('body').append('<div id="mouseMap"></div>');
+
+		function drawName(e) {
 			for (var i in a.country) {
-				this.names(a.country[i]);
+				names(a.country[i]);
 			}
 		};
-		this.names = function(id) {
-			jQuery('#'+id).mouseenter(function(e) {
-				//console.log(worldmap.names[id]);
-				jQuery(this).mousemove(function(e) {
-					var x = e.pageX, y = e.pageY;
-					var obH = jQuery('#mouseMap').height();
-					jQuery('#mouseMap').css({
-						position: "absolute",
-						top: y-(obH/2),
-						left: x+20
-					});
-					jQuery('#mouseMap').html('<p>'+worldmap.names[id]+'</p>');
+
+		function names(id) {
+			$('#'+id).mousemove(mouseon(id));
+			$('#'+id).mouseenter(mouseon(id));
+			$('#'+id).mouseleave(mouseoff);
+			$('#pointer-'+id).mousemove(mouseon(id));
+			$('#pointer-'+id).mouseenter(mouseon(id));
+			$('#pointer-'+id).mouseleave(mouseoff);
+		};
+
+		function mouseon(id) {
+			return function mouseon_handler(e) {
+				var x = e.pageX,
+					y = e.pageY,
+					o = $('#mouseMap'),
+					p = o.parent(),
+					w = p.width(),
+					wc = o.width(),
+					left;
+
+				if (x+(wc/2) > (w+p.offset().left)) {
+					left = x-(wc/2) - (x+(wc/2) - w) + p.offset().left;
+				}
+				else if (x-(wc/2) < p.offset().left) {
+					left = x-(wc/2) - (x-(wc/2) - p.offset().left);
+				}
+				else {
+					left = x-(wc/2);
+				}
+				o.css({
+					position: "absolute",
+					left: left,
+					top: y+5,
 				});
-			});
-			jQuery('#'+id).mouseleave(function() {
-				jQuery('#mouseMap').html('');
-			});
+
+				o.html('<p>'+worldmap.names[id]+'</p>');
+			};
 		};
-		this.__constructor = function() {
-			e[0].innerHTML = this.draw(a.country);
-			this.drawName();
-			return this
-		};
-		return this.__constructor()
+
+		function mouseoff() {
+			$('#mouseMap').html('');
+		}
+
+		return this.each(function() {
+            $(this).html(draw(a.country));
+            if (a.names)
+				drawName();
+        });
 	}
-})(jQuery);
+});
